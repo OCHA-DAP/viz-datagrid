@@ -330,6 +330,7 @@ $( document ).ready(function() {
 
   function deepLinkView() {
     var hash = window.location.hash;
+    console.log(window.location);
     if (hash!='') window.location.href = hash;
   }
 

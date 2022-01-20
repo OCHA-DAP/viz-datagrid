@@ -330,10 +330,8 @@ $( document ).ready(function() {
 
   function deepLinkView() {
     var hash = window.location.hash;
-    console.log('l ',window.location);
     if (hash!='') {
-      window.location.href = window.location.href;
-      console.log(hash);
+      window.location.href = hash;
     }
   }
 

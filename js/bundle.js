@@ -332,7 +332,7 @@ $( document ).ready(function() {
     var parentHash = window.parent.location.hash;
     console.log(window.parent.location)
     if (parentHash!='') {
-      window.location.href = hash;
+      window.location.href = parentHash;
     }
   }
 

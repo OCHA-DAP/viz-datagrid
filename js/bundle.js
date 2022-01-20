@@ -329,9 +329,9 @@ $( document ).ready(function() {
   }
 
   function deepLinkView() {
-    var hash = window.location.hash;
+    var parentHash = window.parent.location.hash;
     console.log(window.parent.location)
-    if (hash!='') {
+    if (parentHash!='') {
       window.location.href = hash;
     }
   }

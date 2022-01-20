@@ -331,7 +331,7 @@ $( document ).ready(function() {
   function deepLinkView() {
     var hash = window.location.hash;
     console.log(window.location);
-    if (hash!='') window.location.href = window.location.href;
+    if (hash!='') window.location.href = hash;
   }
 
   function initTracking() {

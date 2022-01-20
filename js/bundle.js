@@ -330,7 +330,6 @@ $( document ).ready(function() {
 
   function deepLinkView() {
     var parentHash = window.parent.location.hash;
-    console.log(window.parent.location)
     if (parentHash!='') {
       window.location.href = parentHash;
     }

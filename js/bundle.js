@@ -22,7 +22,7 @@ $( document ).ready(function() {
   var countryCount, categoryCount, globalCounts, date;
   var rowCount = 0;
   var metricColors = {data1: '#007CE1', data2: '#C0D7EB', data3: '#E6E7E8'};
-  var metricNames = {data1: 'Available', data2: 'Not Up-to-date', data3: 'Unavailable'}
+  var metricNames = {data1: 'Available and Up-to-date', data2: 'Available and Not Up-to-date', data3: 'Unavailable'}
   var countryNames, datasetCounts = [];
 
   var tooltipActive = false;
@@ -42,8 +42,6 @@ $( document ).ready(function() {
       d3.csv(DATA_PATH + GLOBAL_COUNTS_ID)
     ]).then(function(data){
       globalCounts = data[2][0];
-
-      console.log('globalCounts',globalCounts)
       datasetCounts = data[1];
 
       countryNames = datasetCounts.map(row => ({
@@ -62,6 +60,28 @@ $( document ).ready(function() {
       //load the subcategory view
       $('.subcategory-container div a').html('<iframe id="subcategory-view" src="https://ocha-dap.github.io/viz-datagrid-subcategories"></iframe>');
     });
+  }
+
+  function createIntro() {
+    let strLength = 345;
+    let text = 'The Data Grid shows the most important crisis data across six categories and several sub-categories. Data may be included in the Data Grid if it is relevant to the sub-category, sub-national, has broad geographic coverage, and is shared in a commonly used format. If a dataset on HDX meets these criteria, data for the sub-category is considered ‘available’. We then assess its timeliness. We make a distinction between whether the data is up-to-date or not up-to-date, according to the update frequency set by the contributing organization. Data is considered ‘unavailable’ if it does not meet the above criteria or it has not been shared on HDX.';
+    let intro = $('<p>'+ truncateString(text, strLength) +' <a href="#" class="expand">Show more</a></p>');
+    $('#intro').append(intro)
+    intro.click(function() {
+      if ($(this).find('a').hasClass('collapse')) {
+        $(this).html(truncateString(text, strLength) + ' <a href="#" class="expand">Show more</a>');
+      }
+      else {
+        $(this).html(text + ' <a href="#" class="collapse">Show less</a>');
+      }
+    });
+  }
+
+  function truncateString(str, num) {
+    if (str.length <= num) {
+      return str;
+    }
+    return str.slice(0, num) + '...';
   }
 
   function parseData(data) {
@@ -176,9 +196,9 @@ $( document ).ready(function() {
       bindto: '.donut-chart',
       data: {
         columns: [
-            ['data1', totals['Available']],
-            ['data2', totals['Not Up-to-date']],
-            ['data3', totals['Empty']]
+            ['data1', totals['Available and Up-to-date']],
+            ['data2', totals['Available and Not Up-to-date']],
+            ['data3', totals['Unavailable']]
         ],
         type: 'donut',
         names: metricNames,
@@ -192,20 +212,50 @@ $( document ).ready(function() {
             return value+'%';
           }
         }
+      },
+      legend: {
+        show: false
       }
     });
 
-    var firstLegend = d3.select(".c3-legend-item");
-    var legendContainer = d3.select(firstLegend.node().parentNode);
-    var legendX = parseInt(firstLegend.select('text').attr('x'));
-    var legendY = parseInt(firstLegend.select('text').attr('y'));
-    legendContainer
-      .attr('class', 'donut-legend-container')
-      .append('text')
-      .text('Global Data Grid Availability:')
-      .attr('class', 'donut-legend-title')
-      .attr('x', legendX - 10)
-      .attr('y', legendY - 20);
+
+    // Add legend
+    d3.select('.donut-chart').append('h3').html('Global Data Grid Availability:');
+    
+    // Create the legend container
+    var legend = d3.select('.donut-chart')
+      .append('div')
+      .attr('class', 'donut-legend');
+
+    // Bind the data to individual legend keys
+    var legendKeys = legend.selectAll('.legend-key')
+      .data(['data1', 'data2', 'data3'])
+      .enter()
+      .append('div')
+      .attr('class', 'legend-key')
+      .attr('data-id', function(d) { return d; });
+
+    // Append the color chip
+    legendKeys.append('span')
+      .attr('class', 'legend-chip')
+      .style('display', 'inline-block')
+      .style('width', '12px')
+      .style('height', '12px')
+      .style('background-color', function(d) { return chart.color(d); })
+      .style('margin-right', '5px');
+
+    // Append the text label
+    legendKeys.append('span')
+      .attr('class', 'legend-text')
+      .text(function(d) { return metricNames[d]; });
+
+    // Add mouseover and mouseout events for interactivity
+    legendKeys.on('mouseover', function(d) {
+        chart.focus(d);
+    })
+    .on('mouseout', function(d) {
+        chart.revert();
+    });
 
     //key figures
     metricTotals.forEach(function(metric, index) {
@@ -213,7 +263,6 @@ $( document ).ready(function() {
       var value = metric[1] + '<span>%</span>';
       createKeyFigure(title, value);
     });
-
 
     createKeyFigure('Number of Locations', countryCount);
     createKeyFigure('Number of Categories', globalCounts['Category Count']);
@@ -225,9 +274,9 @@ $( document ).ready(function() {
     let totals = new Object();
 
     // Convert percentages to whole numbers
-    let complete = Math.round(globalCounts['Total Percentage Data Complete'] * 100);
-    let incomplete = Math.round(globalCounts['Total Percentage Data Incomplete'] * 100);
-    let noData = Math.round(globalCounts['Total Percentage No Data'] * 100);
+    let complete = Math.round(globalCounts['Rounded Total Percentage Data Complete'] * 100);
+    let incomplete = Math.round(globalCounts['Rounded Total Percentage Data Incomplete'] * 100);
+    let noData = Math.round(globalCounts['Rounded Total Percentage No Data'] * 100);
 
     // Ensure the sum of the percentages equals 100
     let totalSum = complete + incomplete + noData;
@@ -244,9 +293,9 @@ $( document ).ready(function() {
         }
     }
 
-    totals['Available'] = complete;
-    totals['Not Up-to-date'] = incomplete;
-    totals['Empty'] = noData;
+    totals['Available and Up-to-date'] = complete;
+    totals['Available and Not Up-to-date'] = incomplete;
+    totals['Unavailable'] = noData;
 
     return totals;
   }
@@ -385,5 +434,6 @@ $( document ).ready(function() {
   }
 
   getData();
+  createIntro();
   //initTracking();
 });

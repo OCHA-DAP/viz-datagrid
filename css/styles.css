@@ -1545,7 +1545,7 @@ h4 {
 p {
   font-family: "Source Sans Pro", sans-serif;
   font-size: 16px;
-  line-height: 18px;
+  line-height: 20px;
 }
 
 .small {
@@ -1608,6 +1608,7 @@ ul.actions li.social a i {
 .overview-container {
   display: flex;
   flex-flow: row;
+  position: relative;
 }
 .overview-container .donut-chart {
   margin-top: 30px;
@@ -1617,6 +1618,49 @@ ul.actions li.social a i {
   display: flex;
   flex-wrap: wrap;
 }
+.overview-container text {
+  pointer-events: none;
+}
+.overview-container .chart-container,
+.overview-container .tooltip {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 30px;
+}
+.overview-container .bar {
+  cursor: pointer;
+}
+.overview-container .group-border {
+  fill: none;
+  stroke: #007CE1;
+  stroke-width: 1;
+}
+.overview-container .tooltip {
+  background-color: #FFF;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  display: none;
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 18px;
+  padding: 8px 12px;
+  position: absolute;
+  pointer-events: none;
+}
+.overview-container .tooltip text {
+  pointer-events: none;
+}
+.overview-container .tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #FFF transparent transparent transparent;
+}
 
 .key-figure {
   padding: 0 14px 5px;
@@ -1624,6 +1668,9 @@ ul.actions li.social a i {
 }
 .key-figure .inner {
   border-bottom: 1px solid #CCC;
+}
+.key-figure .inner h3 {
+  min-height: 42px;
 }
 
 .legend {
@@ -1785,21 +1832,25 @@ ul.actions li.social a i {
 }
 
 .c3-legend-item text {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .donut-chart svg {
   overflow: visible !important;
 }
-
-.donut-legend-container {
-  transform: translate(0, 220px);
+.donut-chart h3 {
+  margin-left: 50px;
 }
-
-.donut-legend-title {
-  font-family: "Gotham-Bold", sans-serif;
-  font-size: 14px;
-  transform: translate(-15px, 0);
+.donut-chart .donut-legend {
+  margin-left: 60px;
+}
+.donut-chart .legend-key {
+  align-items: center;
+  display: flex;
+  padding-bottom: 4px;
+}
+.donut-chart .legend-text {
+  font-size: 13px;
 }
 
 #subcategory-view {
